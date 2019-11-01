@@ -1,6 +1,0 @@
-localhost {
-    tls off
-    root /srv/html
-    geoip GeoLite2-City.mmdb
-    header Country-Code {geoip_country_code}
-}
