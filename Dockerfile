@@ -1,7 +1,6 @@
 FROM gcr.io/gcp-runtimes/go1-builder:1.13 as builder
 
 WORKDIR /go/src/app
-COPY .git .git
 COPY cmd cmd
 COPY pkg pkg
 
