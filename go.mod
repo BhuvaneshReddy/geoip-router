@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/etherlabsio/pkg v0.0.0-20191020161600-58998d98f9ce
+	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-kit/kit v0.9.0
 	github.com/oklog/run v1.0.0
 	github.com/oschwald/geoip2-golang v1.3.0

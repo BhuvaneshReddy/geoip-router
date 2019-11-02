@@ -2,7 +2,6 @@ package geoip
 
 import (
 	"context"
-	"fmt"
 	"net"
 
 	"github.com/oschwald/geoip2-golang"
@@ -33,6 +32,5 @@ func (r *DatabaseResolver) ResolveCountryCode(_ context.Context, ip net.IP) (cod
 	if err != nil {
 		return code, err
 	}
-	fmt.Println("ISO country code: ", record.Country.IsoCode)
 	return ParseISOCode(record.Country.IsoCode), nil
 }

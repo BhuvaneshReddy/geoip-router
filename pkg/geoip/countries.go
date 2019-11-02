@@ -1,5 +1,7 @@
 package geoip
 
+import "strings"
+
 // ISOCountryCode reprents the set of countries supported by HFN GeoRouter
 type ISOCountryCode string
 
@@ -17,7 +19,7 @@ const DefaultISOCountryCode = ISOCountryCodeUS
 
 // ParseISOCode parses any given ISO code in string format to a supported ISOCountryCode type
 func ParseISOCode(code string) ISOCountryCode {
-	switch code {
+	switch strings.ToLower(code) {
 	case ISOCountryCodeIN.String():
 		return ISOCountryCodeIN
 	default:

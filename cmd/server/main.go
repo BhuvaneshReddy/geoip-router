@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-kit/kit/log"
 
 	stdlog "log"
@@ -62,9 +64,13 @@ func main() {
 	var resolver geoip.Resolver
 	{
 		resolver = geoip.NewDatabaseResolver(db, geoip.DefaultISOCountryCode)
+		resolver = geoip.NewResolverLoggingMiddleware(logger)(resolver)
 	}
 
-	r := http.NewServeMux()
+	r := chi.NewRouter()
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/healthz"))
+	r.Mount("/debug", middleware.Profiler())
 	r.Handle("/us", http.NotFoundHandler())
 	r.Handle("/in", http.NotFoundHandler())
 	r.Handle("/", geoip.HTTPResolverHandler(resolver))
