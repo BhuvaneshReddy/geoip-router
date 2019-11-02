@@ -8,14 +8,11 @@ COPY pkg pkg
 ENV CGO_ENABLED 0
 ARG cmd=server
 
-RUN REVISION=$(git rev-parse HEAD) && \
-    BUILD_DATE=$(date -u +%d%m%Y.%H%M%S) && \
-    BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) && \
+RUN BUILD_DATE=$(date -u +%d%m%Y.%H%M%S) && \
     DATE=$(date -u +%d%m%Y.%H%M%S) && \
     GO_VERSION=$(go version | awk '{print $3}') && \
-    VERSION=$(git describe --abbrev=0) && \
     APP_NAME=${cmd} && \
-    go build -tags debug -o /dist/server -v -i -ldflags="-X github.com/etherlabsio/pkg/version.revision=$REVISION -X github.com/etherlabsio/pkg/version.branch=$BRANCH_NAME -X github.com/etherlabsio/pkg/version.buildDate=$DATE -X github.com/etherlabsio/pkg/version.appName=$APP_NAME -X github.com/etherlabsio/pkg/version.version=$VERSION -X github.com/etherlabsio/pkg/version.goVersion=$GO_VERSION -s -w" ./cmd/${cmd}
+    go build -tags debug -o /dist/server -v -i -ldflags="-X github.com/etherlabsio/pkg/version.buildDate=$DATE -X github.com/etherlabsio/pkg/version.appName=$APP_NAME -X github.com/etherlabsio/pkg/version.goVersion=$GO_VERSION -s -w" ./cmd/${cmd}
 
 # Application image.
 FROM gcr.io/distroless/base:latest
