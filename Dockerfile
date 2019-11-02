@@ -9,9 +9,9 @@ ARG cmd=server
 
 RUN BUILD_DATE=$(date -u +%d%m%Y.%H%M%S) && \
     DATE=$(date -u +%d%m%Y.%H%M%S) && \
-    GO_VERSION=$(go version | awk '{print $3}') && \
+    GO_VERSION=$(/usr/local/go/bin/go  version | awk '{print $3}') && \
     APP_NAME=${cmd} && \
-    go build -tags debug -o /dist/server -v -i -ldflags="-X github.com/etherlabsio/pkg/version.buildDate=$DATE -X github.com/etherlabsio/pkg/version.appName=$APP_NAME -X github.com/etherlabsio/pkg/version.goVersion=$GO_VERSION -s -w" ./cmd/${cmd}
+    /usr/local/go/bin/go build -tags debug -o /dist/server -v -i -ldflags="-X github.com/etherlabsio/pkg/version.buildDate=$DATE -X github.com/etherlabsio/pkg/version.appName=$APP_NAME -X github.com/etherlabsio/pkg/version.goVersion=$GO_VERSION -s -w" ./cmd/${cmd}
 
 # Application image.
 FROM gcr.io/distroless/base:latest
