@@ -26,3 +26,6 @@ func ParseISOCode(code string) ISOCountryCode {
 		return ISOCountryCodeUS
 	}
 }
+
+// CountryLocationRoutingRules provides a mapping to the location to redirect based on the country code. Relative paths are also supported
+type CountryLocationRoutingRules map[ISOCountryCode]string

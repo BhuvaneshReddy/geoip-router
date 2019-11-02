@@ -67,13 +67,19 @@ func main() {
 		resolver = geoip.NewResolverLoggingMiddleware(logger)(resolver)
 	}
 
+	rules := geoip.CountryLocationRoutingRules{
+		geoip.ISOCountryCodeUS: "/us",
+		geoip.ISOCountryCodeIN: "/in",
+	}
+	geoRouter := geoip.HTTPResolverHandler(resolver, rules)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/healthz"))
 	r.Mount("/debug", middleware.Profiler())
 	r.Handle("/us", http.NotFoundHandler())
 	r.Handle("/in", http.NotFoundHandler())
-	r.Handle("/", geoip.HTTPResolverHandler(resolver))
+	r.Handle("/", geoRouter)
 
 	// Now we're to the part of the func main where we want to start actually
 	// running things, like servers bound to listeners to receive connections.

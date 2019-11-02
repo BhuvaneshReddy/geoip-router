@@ -2,7 +2,6 @@ package geoip
 
 import (
 	"bytes"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -85,14 +84,15 @@ func getIPAdress(r *http.Request) net.IP {
 }
 
 // HTTPResolverHandler from an HTTP Request
-func HTTPResolverHandler(resolver Resolver) http.HandlerFunc {
+func HTTPResolverHandler(resolver Resolver, rules CountryLocationRoutingRules) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		clientIP := getIPAdress(r)
-		resolvedCountry, err := resolver.ResolveCountryCode(r.Context(), clientIP)
-		if err != nil {
-			// resolvers are responsible for providing a fallback country code
-			log.Printf("warn: error resolving ip: %s : %+v", clientIP, err)
+		resolvedCountry, _ := resolver.ResolveCountryCode(r.Context(), clientIP)
+		loc, ok := rules[resolvedCountry]
+		if !ok {
+			// Default to a relative location if rules don't match
+			loc = "/" + resolvedCountry.String()
 		}
-		http.Redirect(w, r, "/"+resolvedCountry.String(), http.StatusFound)
+		http.Redirect(w, r, loc, http.StatusFound)
 	}
 }
