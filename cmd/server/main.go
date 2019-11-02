@@ -75,7 +75,8 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.Heartbeat("/healthz"))
+	r.Use(middleware.Heartbeat("/liveness_check"))
+	r.Use(middleware.Heartbeat("/readiness_check"))
 	r.Mount("/debug", middleware.Profiler())
 	r.Handle("/us", http.NotFoundHandler())
 	r.Handle("/in", http.NotFoundHandler())
