@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-kit/kit/log"
+	"github.com/ip2location/ip2location-go"
 
 	stdlog "log"
 
@@ -29,8 +30,9 @@ import (
 )
 
 type Configuration struct {
-	databasePath *string
-	httpAddr     *string
+	resolver   *string
+	dbFilePath *string
+	httpAddr   *string
 }
 
 func exitOnErr(err error) {
@@ -43,8 +45,9 @@ func exitOnErr(err error) {
 func main() {
 	fs := flag.NewFlagSet("geo-router", flag.ExitOnError)
 	config := Configuration{
-		databasePath: fs.String("geoip/db/path", "resources/GeoLite2-Country.mmdb", "base url for the API server"),
-		httpAddr:     fs.String("http/addr", ":8080", "address to bind the http listener"),
+		resolver:   fs.String("resolver", "maxmind", "resolver to use for resolving IP to a Country Code"),
+		dbFilePath: fs.String("db_file_path", "resources/GeoLite2-Country.mmdb", "base url for the API server"),
+		httpAddr:   fs.String("http_addr", ":8080", "address to bind the http listener"),
 	}
 	err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarNoPrefix())
 	exitOnErr(err)
@@ -57,15 +60,23 @@ func main() {
 		logger = zaplogger.NewZapSugarLogger(zaplog, zapcore.InfoLevel)
 	}
 
-	db, err := geoip2.Open(*config.databasePath)
-	exitOnErr(err)
-	defer db.Close()
-
 	var resolver geoip.Resolver
-	{
-		resolver = geoip.NewDatabaseResolver(db, geoip.DefaultISOCountryCode)
-		resolver = geoip.NewResolverLoggingMiddleware(logger)(resolver)
+	if *config.resolver == "ip2location" {
+		db, err := geoip2.Open(*config.dbFilePath)
+		exitOnErr(err)
+		defer db.Close()
+
+		resolver = geoip.NewMaxMindResolver(db)
+	} else {
+		ip2location.Open(*config.dbFilePath)
+		defer ip2location.Close()
+
+		resolver = geoip.NewIP2LocationResolver()
 	}
+
+	// applying common middlewares
+	resolver = geoip.DefaultProxyResolver()(resolver)
+	resolver = geoip.ErrorLoggingResolverMiddleware(logger)(resolver)
 
 	rules := geoip.CountryLocationRoutingRules{
 		geoip.ISOCountryCodeUS: "/us",

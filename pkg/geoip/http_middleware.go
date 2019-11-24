@@ -86,7 +86,10 @@ func getIPAdress(r *http.Request) net.IP {
 func HTTPResolverHandler(resolver Resolver, rules CountryLocationRoutingRules) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		clientIP := getIPAdress(r)
-		resolvedCountry, _ := resolver.ResolveCountryCode(r.Context(), clientIP)
+		resolvedCountry, err := resolver.ResolveCountryCode(r.Context(), clientIP)
+		if err != nil {
+			resolvedCountry = DefaultISOCountryCode
+		}
 		loc, ok := rules[resolvedCountry]
 		if !ok {
 			// Default to a relative location if rules don't match

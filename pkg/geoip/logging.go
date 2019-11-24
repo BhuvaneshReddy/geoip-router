@@ -11,8 +11,8 @@ import (
 // ResolverMiddleware supports error logging
 type ResolverMiddleware func(Resolver) Resolver
 
-// NewResolverLoggingMiddleware returns a ResolverMiddleware with error logging
-func NewResolverLoggingMiddleware(l log.Logger) ResolverMiddleware {
+// ErrorLoggingResolverMiddleware returns a ResolverMiddleware with error logging
+func ErrorLoggingResolverMiddleware(l log.Logger) ResolverMiddleware {
 	return func(r Resolver) Resolver {
 		return &errorLoggingMiddleware{
 			logger: l,
