@@ -45,7 +45,7 @@ func exitOnErr(err error) {
 func main() {
 	fs := flag.NewFlagSet("geo-router", flag.ExitOnError)
 	config := Configuration{
-		resolver:   fs.String("resolver", "ip2location", "resolver to use for resolving IP to a Country Code"),
+		resolver:   fs.String("resolver", "maxmind", "resolver to use for resolving IP to a Country Code"),
 		dbFilePath: fs.String("db_file_path", "resources/GeoLite2-Country.mmdb", "base url for the API server"),
 		httpAddr:   fs.String("http_addr", ":8080", "address to bind the http listener"),
 	}
